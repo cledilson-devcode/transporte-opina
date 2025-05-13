@@ -4,20 +4,39 @@ Uma API RESTful construída com Node.js, Express e MySQL para gerenciar feedback
 
 ## Tecnologias Utilizadas
 
-*   Node.js
-*   Express.js
-*   MySQL (com o driver `mysql2`)
-*   `dotenv` para gerenciamento de variáveis de ambiente
-*   `cors` para habilitar requisições cross-origin
+*   **Node.js:** Ambiente de execução JavaScript no servidor.
+*   **Yarn:** Gerenciador de pacotes (alternativa ao npm).
+*   **Express.js:** Framework web minimalista para Node.js, usado para construir a API.
+*   **MySQL:** Sistema de Gerenciamento de Banco de Dados Relacional.
+    *   **mysql2:** Driver otimizado para Node.js para interagir com o MySQL.
+*   **dotenv:** Módulo para carregar variáveis de ambiente de um arquivo `.env`.
+*   **cors:** Middleware para habilitar Cross-Origin Resource Sharing (CORS).
 
 ## Pré-requisitos
 
 Antes de começar, você precisará ter instalado em sua máquina:
 
-*   [Node.js](https://nodejs.org/) (versão LTS recomendada)
-*   [MySQL Server](https://dev.mysql.com/downloads/mysql/) (ou um servidor MySQL compatível como MariaDB)
+1.  **Node.js (que inclui npm, mas usaremos Yarn):**
+    *   Vá para [Node.js](https://nodejs.org/) e baixe a versão LTS recomendada para o seu sistema operacional.
+    *   Siga as instruções de instalação. Isso também instalará o `npm`.
 
-## Configuração e Instalação
+2.  **Yarn (Gerenciador de Pacotes):**
+    *   Após instalar o Node.js, você pode instalar o Yarn globalmente usando o npm:
+        ```bash
+        npm install --global yarn
+        ```
+    *   Verifique a instalação:
+        ```bash
+        yarn --version
+        ```
+
+3.  **MySQL Server:**
+    *   **Opção 1: MySQL Community Server:** Vá para [MySQL Downloads](https://dev.mysql.com/downloads/mysql/) e baixe o "MySQL Installer" para Windows ou os pacotes apropriados para macOS/Linux. Durante a instalação, certifique-se de instalar o "MySQL Server" e definir uma senha para o usuário `root`.
+    *   **Opção 2: Docker:** Se preferir, você pode rodar o MySQL em um container Docker.
+    *   **Opção 3: XAMPP/WAMP/MAMP/Laragon:** Esses pacotes incluem o MySQL Server e são fáceis de instalar e gerenciar.
+    *   **Importante:** Certifique-se de que o serviço do MySQL Server esteja em execução.
+
+## Configuração e Instalação do Projeto
 
 1.  **Clone o repositório:**
     ```bash
@@ -25,14 +44,16 @@ Antes de começar, você precisará ter instalado em sua máquina:
     cd <NOME_DA_PASTA_DO_PROJETO>
     ```
 
-2.  **Instale as dependências do projeto:**
+2.  **Instale as dependências do projeto usando Yarn:**
+    (O Yarn lerá o arquivo `package.json` para saber quais pacotes instalar: Express, mysql2, dotenv, cors, etc.)
     ```bash
-    npm install
+    yarn install
     ```
+    *Se preferir usar npm, o comando seria `npm install`.*
 
 3.  **Configure o Banco de Dados MySQL:**
-    *   Acesse seu servidor MySQL.
-    *   Crie um banco de dados para a aplicação (ex: `db_transporte-opina`).
+    *   Acesse seu servidor MySQL (usando um cliente como MySQL Workbench, DBeaver, ou a linha de comando).
+    *   Crie um banco de dados para a aplicação (ex: `db_transporte_opina`):
         ```sql
         CREATE DATABASE db_transporte_opina;
         ```
@@ -70,9 +91,9 @@ Antes de começar, você precisará ter instalado em sua máquina:
         ```dotenv
         # .env
         DB_HOST=localhost
-        DB_USER=seu_usuario_mysql
-        DB_PASSWORD=sua_senha_mysql
-        DB_NAME=db_transporte_opina # O mesmo nome do banco que você criou
+        DB_USER=seu_usuario_mysql    # Ex: root
+        DB_PASSWORD=sua_senha_mysql  # Senha do usuário MySQL
+        DB_NAME=db_transporte_opina  # O mesmo nome do banco que você criou
         PORT=8800
         ```
     *   **Importante:** Adicione `.env` ao seu arquivo `.gitignore` para não enviar suas credenciais ao repositório.
@@ -80,16 +101,17 @@ Antes de começar, você precisará ter instalado em sua máquina:
 ## Rodando a Aplicação
 
 1.  **Para iniciar o servidor em modo de desenvolvimento (com Nodemon, se configurado):**
+    (Assumindo que você tem um script `dev` no seu `package.json` como `"dev": "nodemon app.js"`)
     ```bash
-    npm run dev
+    yarn dev
     ```
-    *(Se você não configurou um script `dev` com Nodemon no seu `package.json`, use o comando abaixo.)*
 
 2.  **Para iniciar o servidor normalmente:**
+    (Assumindo que você tem um script `start` no seu `package.json` como `"start": "node app.js"`)
     ```bash
-    npm start
+    yarn start
     ```
-    *(Ou `node app.js` se o script `start` não estiver definido como `node app.js` no `package.json`.)*
+    *Se não tiver scripts definidos, use `node app.js`.*
 
 3.  A API estará disponível em `http://localhost:8800` (ou a porta que você definiu em `.env`).
 
@@ -105,8 +127,7 @@ O prefixo base para todos os endpoints é `/api`.
             "bus_line": "101 - Centro",
             "overall_rating": 4,
             "safety_rating": 5,
-            "comment": "Boa viagem!",
-            // ... outros campos opcionais
+            // ... outros campos obrigatórios e opcionais
         }
         ```
 *   **`GET /feedbacks`**: Lista todos os feedbacks.
@@ -116,5 +137,3 @@ O prefixo base para todos os endpoints é `/api`.
 *   **`DELETE /feedbacks/:id`**: Deleta um feedback específico pelo seu ID.
 
 ---
-
-Sinta-se à vontade para adicionar mais seções como "Contribuição", "Licença", ou detalhes sobre validações específicas conforme seu projeto evolui. Este é um bom ponto de partida!
