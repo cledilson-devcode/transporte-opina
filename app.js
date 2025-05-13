@@ -1,29 +1,57 @@
-// app.js (na raiz do projeto)
+// app.js
+// Este é o ponto de entrada principal da sua aplicação API.
 
-const express = require('express'); // Importa o Express (usando require)
-const cors = require('cors'); // Importa o CORS (usando require)
-const feedbackRoutes = require('./src/routes/feedbackRoutes'); // Importa suas rotas de feedback
-require('dotenv').config(); // Carrega variáveis de ambiente do arquivo .env
+// --- Importações de Módulos ---
+const express = require('express');       // Framework web para Node.js
+const cors = require('cors');             // Middleware para habilitar Cross-Origin Resource Sharing
+const dotenv = require('dotenv');         // Carrega variáveis de ambiente do arquivo .env
 
-const app = express(); // Cria a instância do Express
-const PORT = process.env.PORT || 8800; // Usa a porta do .env ou 8800 como padrão
+// --- Configuração Inicial ---
+dotenv.config(); // <<<<<<< CORREÇÃO APLICADA: Carrega .env PRIMEIRO <<<<<<<
+                 // Garante que as variáveis de ambiente estejam disponíveis antes de serem usadas
+
+const feedbackRoutes = require('./src/routes/feedbackRoutes'); // Importa as rotas definidas para feedbacks
+// Agora que .env está carregado, a configuração do banco pode acessar process.env
+require('./src/config/database'); // Importa a configuração do banco para executar o teste de conexão
+
+const app = express(); // Cria uma instância da aplicação Express
+// Agora process.env.PORT (se definido no .env) estará disponível
+const PORT = process.env.PORT || 8800; // Define a porta: usa a variável PORT do .env ou 8800 como padrão
 
 // --- Middlewares Globais ---
-app.use(cors()); // Habilita o CORS para todas as origens (pode ser configurado de forma mais restrita)
-app.use(express.json()); // Habilita o parsing de JSON no corpo das requisições
-app.use(express.urlencoded({ extended: true })); // Permite parsear dados de formulários URL-encoded
+// Habilita o CORS para permitir requisições de diferentes origens
+app.use(cors());
+
+// Habilita o parsing (análise) de corpos de requisição no formato JSON
+app.use(express.json());
+
+// Habilita o parsing de corpos de requisição no formato URL-encoded
+app.use(express.urlencoded({ extended: true }));
 
 // --- Rotas da Aplicação ---
-// Monta as rotas definidas em feedbackRoutes sob o prefixo '/api'
+// Define um prefixo '/api' para todas as rotas definidas em feedbackRoutes.
 app.use('/api', feedbackRoutes);
 
-// Rota de exemplo para a raiz
+// Rota de "health check" ou boas-vindas para a raiz da API
 app.get('/', (req, res) => {
-  res.send('API de Feedback está funcionando!');
+  res.status(200).json({ message: 'Bem-vindo à API de Feedback de Transporte!' });
+});
+
+// Middleware para lidar com rotas não encontradas (404)
+app.use((req, res, next) => {
+  res.status(404).json({ message: 'Rota não encontrada.' });
+});
+
+// Middleware para tratamento de erros genéricos
+app.use((err, req, res, next) => {
+  console.error("ERRO NÃO TRATADO:", err.stack || err.message || err);
+  res.status(err.status || 500).json({
+      message: err.message || 'Ocorreu um erro interno no servidor.',
+  });
 });
 
 // --- Iniciar o Servidor ---
 app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
-  console.log(`Acesse em: http://localhost:${PORT}`);
+  console.log(`Servidor iniciado e escutando na porta ${PORT}`);
+  console.log(`Acesse a API em: http://localhost:${PORT}`);
 });
